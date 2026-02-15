@@ -196,7 +196,8 @@ const ALLOWED_FILES = [
     'admin.js',
     'mod-detail.js',
     'utils.js',
-    'logs.js'
+    'logs.js',
+    'favicon.ico'
 ];
 
 app.use((req, res, next) => {

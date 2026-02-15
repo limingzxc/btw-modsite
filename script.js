@@ -1,4 +1,3 @@
-const API_BASE = '/api';
 let currentUser = null;
 
 document.addEventListener('DOMContentLoaded', () => {
