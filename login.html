@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - BTW</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-cube"></i>
+                <span>BTW - 比狼好</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="admin.html">管理</a></li>
+                <li id="authMenuLogin">
+                    <a href="login.html" class="active auth-link">登录</a>
+                    <a href="register.html">注册</a>
+                </li>
+                <li id="userMenuLogin" style="display: none;">
+                    <span class="welcome-user">欢迎, <strong id="usernameDisplayLogin"></strong></span>
+                    <a href="index.html" onclick="handleLogoutAndRedirect(); return false;"><i class="fas fa-sign-out-alt"></i> 退出</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <i class="fas fa-sign-in-alt"></i>
+                <h2>用户登录</h2>
+                <p>欢迎回来，请登录您的账号</p>
+            </div>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" required placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" required placeholder="请输入密码">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">
+                    <i class="fas fa-sign-in-alt"></i> 登录
+                </button>
+                <p class="auth-switch">
+                    还没有账号？<a href="register.html">立即注册</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="utils.js"></script>
+    <script>
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLoginStatus();
+
+            const form = document.getElementById('loginForm');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        localStorage.setItem('userToken', data.user.token);
+                        localStorage.setItem('currentUsername', data.user.username);
+                        currentUser = { username: data.user.username };
+                        updateAuthUI();
+                        showNotification('登录成功', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 1500);
+                    } else {
+                        console.error('登录错误:', data);
+                        showNotification(data.error || '登录失败', 'error');
+                    }
+                } catch (error) {
+                    console.error('登录失败:', error);
+                    showNotification('无法连接服务器，请确保服务器正在运行', 'error');
+                }
+            });
+        });
+
+        function checkLoginStatus() {
+            const token = localStorage.getItem('userToken');
+            const username = localStorage.getItem('currentUsername');
+            if (token && username) {
+                currentUser = { username };
+                updateAuthUI();
+            }
+        }
+
+        function updateAuthUI() {
+            const authMenu = document.getElementById('authMenuLogin');
+            const userMenu = document.getElementById('userMenuLogin');
+            const usernameDisplay = document.getElementById('usernameDisplayLogin');
+
+            if (currentUser) {
+                if (authMenu) authMenu.style.display = 'none';
+                if (userMenu) userMenu.style.display = 'flex';
+                if (usernameDisplay) usernameDisplay.textContent = currentUser.username;
+            } else {
+                if (authMenu) authMenu.style.display = 'flex';
+                if (userMenu) userMenu.style.display = 'none';
+            }
+        }
+
+        function handleLogoutAndRedirect() {
+            try {
+                fetch('http://localhost:3000/api/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Authorization': localStorage.getItem('userToken') }
+                });
+            } catch (error) {
+                console.error('登出失败:', error);
+            }
+
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('currentUsername');
+            currentUser = null;
+            updateAuthUI();
+            showNotification('已登出', 'success');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

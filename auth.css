@@ -1,0 +1,114 @@
+/* 认证页面样式 */
+.auth-container {
+    min-height: calc(100vh - 70px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.auth-box {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.auth-header i {
+    font-size: 3.5rem;
+    background: var(--primary-color);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+}
+
+.auth-header h2 {
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
+}
+
+.auth-header p {
+    color: var(--text-gray);
+    font-size: 0.95rem;
+}
+
+.auth-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.auth-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: var(--darker-bg);
+    color: var(--text-light);
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: #1bd96a;
+    box-shadow: 0 0 0 3px rgba(27, 217, 106, 0.1);
+}
+
+.auth-form input::placeholder {
+    color: var(--text-gray);
+    opacity: 0.6;
+}
+
+.btn-full {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--text-gray);
+    font-size: 0.95rem;
+}
+
+.auth-switch a {
+    color: #2d9cdb;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.auth-switch a:hover {
+    color: #1bd96a;
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .auth-box {
+        padding: 2rem 1.5rem;
+    }
+
+    .auth-header i {
+        font-size: 3rem;
+    }
+
+    .auth-header h2 {
+        font-size: 1.5rem;
+    }
+}

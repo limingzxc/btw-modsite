@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTW - 模组管理</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 登录界面 -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-box">
+                <div class="login-header">
+                    <i class="fas fa-cube"></i>
+                    <h2>BTW 管理后台</h2>
+                    <p>请登录管理员账号</p>
+                </div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <input type="text" id="username" placeholder="请输入用户名" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" placeholder="请输入密码" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> 登录
+                    </button>
+                </form>
+                <p class="login-hint">提示：默认账号 admin / 密码 admin123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理界面 -->
+    <div id="adminPanel" class="admin-panel" style="display: none;">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <i class="fas fa-cube"></i>
+                    <span>BTW - 比狼好</span>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="admin.html" class="active">管理</a></li>
+                    <li><a href="#" id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> 退出</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="admin-container">
+            <aside class="admin-sidebar">
+                <h3>管理面板</h3>
+                <ul>
+                    <li><a href="#add" class="sidebar-link active"><i class="fas fa-plus"></i>添加模组</a></li>
+                    <li><a href="#list" class="sidebar-link"><i class="fas fa-list"></i>模组列表</a></li>
+                    <li><a href="#categories" class="sidebar-link"><i class="fas fa-tags"></i>分类管理</a></li>
+                    <li><a href="#logs" class="sidebar-link"><i class="fas fa-history"></i>日志查看</a></li>
+                </ul>
+            </aside>
+
+            <main class="admin-content">
+                <section id="add" class="admin-section">
+                    <h2><i class="fas fa-plus-circle"></i>添加新模组</h2>
+                    <form id="addModForm" class="mod-form">
+                        <div class="form-group">
+                            <label for="modName">模组名称 *</label>
+                            <input type="text" id="modName" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="modDescription">描述 *</label>
+                            <textarea id="modDescription" name="description" rows="3" required></textarea>
+                        </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="modCategory">分类 *</label>
+                            <select id="modCategory" name="category" required>
+                                <option value="">选择分类</option>
+                                <option value="adventure">冒险</option>
+                                <option value="technology">科技</option>
+                                <option value="magic">魔法</option>
+                                <option value="decoration">装饰</option>
+                                <option value="utility">实用</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="modIcon">图标</label>
+                            <input type="text" id="modIcon" name="icon" placeholder="例如: ⚡, ✨, 🗡️" value="📦">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="modTags">标签 (用逗号分隔)</label>
+                        <input type="text" id="modTags" name="tags" placeholder="例如: 科技, 自动化">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="modRating">评分 (1-5)</label>
+                            <input type="number" id="modRating" name="rating" min="1" max="5" step="0.1" value="4.5">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="modDownloads">下载量</label>
+                            <input type="number" id="modDownloads" name="downloads" min="0" value="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="modCloudLink">网盘链接 *</label>
+                        <input type="url" id="modCloudLink" name="cloudLink" placeholder="https://pan.baidu.com/s/..." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="modSourceLink">源码/来源链接</label>
+                        <input type="url" id="modSourceLink" name="sourceLink" placeholder="https://github.com/...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modBackgroundImage">背景图片链接</label>
+                        <input type="url" id="modBackgroundImage" name="backgroundImage" placeholder="https://example.com/image.jpg">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>保存模组
+                    </button>
+                </form>
+            </section>
+
+            <section id="list" class="admin-section">
+                <h2><i class="fas fa-list"></i>模组列表</h2>
+                <div class="mods-table-container">
+                    <div class="table-header">
+                        <input type="text" id="searchMod" class="search-input" placeholder="搜索模组...">
+                        <select id="filterCategory" class="filter-select">
+                            <option value="">所有分类</option>
+                            <option value="adventure">冒险</option>
+                            <option value="technology">科技</option>
+                            <option value="magic">魔法</option>
+                            <option value="decoration">装饰</option>
+                            <option value="utility">实用</option>
+                        </select>
+                    </div>
+                    <table class="mods-table">
+                        <thead>
+                            <tr>
+                                <th>图标</th>
+                                <th>名称</th>
+                                <th>分类</th>
+                                <th>评分</th>
+                                <th>下载量</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="categories" class="admin-section">
+                <h2><i class="fas fa-tags"></i>分类管理</h2>
+                <div class="category-management">
+                    <div class="add-category-form">
+                        <h3>添加新分类</h3>
+                        <form id="addCategoryForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="categoryName">分类名称 *</label>
+                                    <input type="text" id="categoryName" name="name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="categoryIcon">图标</label>
+                                    <input type="text" id="categoryIcon" name="icon" placeholder="例如: ⚡, ✨">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="categoryDescription">描述</label>
+                                <input type="text" id="categoryDescription" name="description" placeholder="分类描述">
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>添加分类
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="categories-table-container">
+                        <h3>分类列表</h3>
+                        <table class="categories-table">
+                            <thead>
+                                <tr>
+                                    <th>图标</th>
+                                    <th>名称</th>
+                                    <th>描述</th>
+                                    <th>模组数量</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoriesTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="logs" class="admin-section">
+                <h2><i class="fas fa-history"></i>日志查看</h2>
+                <div class="logs-management">
+                    <!-- 统计信息 -->
+                    <div class="logs-stats" id="logsStats">
+                        <div class="stat-card">
+                            <i class="fas fa-database"></i>
+                            <div class="stat-info">
+                                <span class="stat-label">总请求数</span>
+                                <span class="stat-value" id="totalRequests">-</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <div class="stat-info">
+                                <span class="stat-label">平均响应时间</span>
+                                <span class="stat-value" id="avgResponseTime">-</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div class="stat-info">
+                                <span class="stat-label">错误数</span>
+                                <span class="stat-value error" id="errorCount">-</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <div class="stat-info">
+                                <span class="stat-label">最大响应时间</span>
+                                <span class="stat-value" id="maxResponseTime">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 筛选工具栏 -->
+                    <div class="logs-toolbar">
+                        <div class="filter-group">
+                            <input type="text" id="logPathFilter" class="filter-input" placeholder="筛选路径...">
+                            <select id="logMethodFilter" class="filter-select">
+                                <option value="">所有方法</option>
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                                <option value="DELETE">DELETE</option>
+                            </select>
+                            <select id="logStatusFilter" class="filter-select">
+                                <option value="">所有状态</option>
+                                <option value="200">200 - 成功</option>
+                                <option value="201">201 - 已创建</option>
+                                <option value="400">400 - 请求错误</option>
+                                <option value="401">401 - 未授权</option>
+                                <option value="404">404 - 未找到</option>
+                                <option value="500">500 - 服务器错误</option>
+                            </select>
+                            <button class="btn btn-secondary" onclick="loadLogs()">
+                                <i class="fas fa-search"></i>查询
+                            </button>
+                            <button class="btn btn-secondary" onclick="resetLogFilters()">
+                                <i class="fas fa-undo"></i>重置
+                            </button>
+                        </div>
+                        <div class="action-group">
+                            <button class="btn btn-secondary" onclick="loadLogsStats()">
+                                <i class="fas fa-sync"></i>刷新统计
+                            </button>
+                            <button class="btn btn-secondary" onclick="exportLogs()">
+                                <i class="fas fa-download"></i>导出CSV
+                            </button>
+                            <button class="btn btn-danger" onclick="cleanupLogs()">
+                                <i class="fas fa-trash"></i>清理旧日志
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 日志表格 -->
+                    <div class="logs-table-container">
+                        <table class="logs-table">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>方法</th>
+                                    <th>路径</th>
+                                    <th>状态</th>
+                                    <th>响应时间</th>
+                                    <th>IP</th>
+                                    <th>用户</th>
+                                    <th>详情</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logsTableBody">
+                                <tr>
+                                    <td colspan="8" style="text-align: center; color: #999;">点击"刷新统计"或"查询"加载日志</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 分页 -->
+                    <div class="pagination" id="logsPagination">
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 编辑模组弹窗 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑模组</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <form id="editModForm" class="mod-form">
+                <input type="hidden" id="editModId">
+                
+                <div class="form-group">
+                    <label for="editModName">模组名称 *</label>
+                    <input type="text" id="editModName" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editModDescription">描述 *</label>
+                    <textarea id="editModDescription" name="description" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editModCategory">分类 *</label>
+                        <select id="editModCategory" name="category" required>
+                            <option value="adventure">冒险</option>
+                            <option value="technology">科技</option>
+                            <option value="magic">魔法</option>
+                            <option value="decoration">装饰</option>
+                            <option value="utility">实用</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editModIcon">图标</label>
+                        <input type="text" id="editModIcon" name="icon">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editModTags">标签 (用逗号分隔)</label>
+                    <input type="text" id="editModTags" name="tags">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editModRating">评分 (1-5)</label>
+                        <input type="number" id="editModRating" name="rating" min="1" max="5" step="0.1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editModDownloads">下载量</label>
+                        <input type="number" id="editModDownloads" name="downloads" min="0">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editModCloudLink">网盘链接 *</label>
+                    <input type="url" id="editModCloudLink" name="cloudLink" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editModSourceLink">源码/来源链接</label>
+                    <input type="url" id="editModSourceLink" name="sourceLink" placeholder="https://github.com/...">
+                </div>
+
+                <div class="form-group">
+                    <label for="editModBackgroundImage">背景图片链接</label>
+                    <input type="url" id="editModBackgroundImage" name="backgroundImage" placeholder="https://example.com/image.jpg">
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>保存修改
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
+                        <i class="fas fa-times"></i>取消
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 编辑分类弹窗 -->
+    <div id="editCategoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑分类</h3>
+                <span class="close-modal" onclick="closeEditCategoryModal()">&times;</span>
+            </div>
+            <form id="editCategoryForm" class="mod-form">
+                <input type="hidden" id="editCategoryId">
+                <div class="form-group">
+                    <label for="editCategoryName">分类名称 *</label>
+                    <input type="text" id="editCategoryName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCategoryIcon">图标</label>
+                    <input type="text" id="editCategoryIcon" name="icon">
+                </div>
+                <div class="form-group">
+                    <label for="editCategoryDescription">描述</label>
+                    <input type="text" id="editCategoryDescription" name="description">
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>保存修改
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditCategoryModal()">
+                        <i class="fas fa-times"></i>取消
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 日志详情弹窗 -->
+    <div id="logDetailModal" class="modal log-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>日志详情</h3>
+                <span class="close-modal" onclick="closeLogDetailModal()">&times;</span>
+            </div>
+            <div class="log-detail-content" id="logDetailContent">
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="utils.js"></script>
+    <script src="admin.js"></script>
+    <script src="logs.js"></script>
+</body>
+</html>

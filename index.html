@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTW比狼好</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-cube"></i>
+                <span>BTW - 比狼好</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home">首页</a></li>
+                <li><a href="#mods">模组列表</a></li>
+                <li><a href="admin.html">管理</a></li>
+                <li><a href="#download">下载</a></li>
+                <li><a href="#contact">联系</a></li>
+                <li id="authMenu">
+                    <a href="login.html">登录</a>
+                    <a href="register.html">注册</a>
+                </li>
+                <li id="userMenu" style="display: none;">
+                    <span class="welcome-user">欢迎, <strong id="usernameDisplay"></strong></span>
+                    <a href="#" onclick="handleLogout(); return false;"><i class="fas fa-sign-out-alt"></i> 退出</a>
+                </li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Better Than Wolves<br>比狼好</h1>
+            <p class="description">比狼好（Better Than Wolves），是一款完全转换型模组，它彻底改造了 Minecraft 的方方面面，不仅引入了许多新物品、新方块，还提供了许多令人难以置信的工程设计功能。</p>
+            <div class="hero-buttons">
+                <a href="#mods" class="btn btn-primary">浏览模组</a>
+                <a href="#download" class="btn btn-secondary">安装指南</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="mods" class="mods">
+        <div class="container">
+            <h2 class="section-title">推荐模组</h2>
+            <div class="filter-buttons">
+                <p style="text-align: center; color: var(--text-gray);">加载分类中...</p>
+            </div>
+            <div class="sort-controls">
+                <label for="sortSelect">排序方式:</label>
+                <select id="sortSelect">
+                    <option value="default">默认</option>
+                    <option value="rating">按评分</option>
+                    <option value="downloads">按下载量</option>
+                    <option value="name">按名称</option>
+                </select>
+            </div>
+            <div class="mods-grid" id="modsGrid">
+                <p style="text-align: center; color: var(--text-gray); grid-column: 1/-1; padding: 2rem;">加载中...</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="download" class="download">
+        <div class="container">
+            <h2 class="section-title">BTW 安装指南</h2>
+            <div class="download-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>下载Legacy Fabric</h3>
+                    <p>下载Minecraft版本为1.6.4的<a href="https://legacyfabric.net/downloads.html" target="_blank">LegacyFabric加载器</a>和<a href="https://modrinth.com/mod/btwce" target="_blank">BTW比狼好模组</a>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>安装模组加载器</h3>
+                    <p>安装Legacy Fabric作为模组加载器，<a href="https://multimc.org/" target="_blank">MultiMC启动器</a>或<a href="https://prismlauncher.org/" target="_blank">Prism启动器</a>，<a href="https://hmcl.huangyuhui.net/" target="_blank">HMCL启动器</a>均支持导入实例，如果想使用PCL启动器游玩，可以进QQ群下载懒人包</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>安装BTW模组</h3>
+                    <p>将BTW主模组jar文件放入mods文件夹，根据需要安装附属模组，请注意附属模组支持的BTW版本</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>启动游戏</h3>
+                    <p>启动器使用Java17-21启动游戏，享受全新的Minecraft体验</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">相关链接</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-globe"></i>
+                        <a href="https://btwce.com" target="_blank">BTW官方网站</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fab fa-github"></i>
+                        <a href="https://github.com/BTW-Community" target="_blank">GitHub - BTW社区</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fab fa-discord"></i>
+                        <a href="https://discord.btwce.com" target="_blank">Discord - BTW社区</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fab fa-qq"></i>
+                        <a href="https://qm.qq.com/cgi-bin/qm/qr?k=JRZZzrqV4TpvoUG4upR17R08wgjmZdwi&jump_from=webapi&authKey=7DFzSbEQnKhA9oNsRcdZChMVDXAGKAMvqYid1UDqWJ+Z5AEqqG0ALjzhJciN28Ce" target="_blank">比狼好BTW中文交流QQ群</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 BTW - 比狼好. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="utils.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模组详情 - BTW</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="mod-detail.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-cube"></i>
+                <span>BTW - 比狼好</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="active">首页</a></li>
+                <li><a href="admin.html">管理</a></li>
+                <li id="authMenuDetail">
+                    <a href="login.html">登录</a>
+                    <a href="register.html">注册</a>
+                </li>
+                <li id="userMenuDetail" style="display: none;">
+                    <span class="welcome-user">欢迎, <strong id="usernameDisplayDetail"></strong></span>
+                    <a href="index.html" onclick="handleLogout(); return false;"><i class="fas fa-sign-out-alt"></i> 退出</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="mod-detail-container">
+        <div id="modDetail" class="mod-detail">
+            <div class="loading">加载中...</div>
+        </div>
+    </div>
+
+    <!-- 评分弹窗 -->
+    <div id="ratingModal" class="modal">
+        <div class="modal-content rating-modal-content">
+            <div class="modal-header">
+                <h3>为模组评分</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p class="rating-intro">请为 <strong id="ratingModName"></strong> 评分</p>
+                <div class="star-rating-container">
+                    <div class="star-rating">
+                        <span class="star" data-rating="1">
+                            <i class="far fa-star"></i>
+                            <span class="star-label">非常差</span>
+                        </span>
+                        <span class="star" data-rating="2">
+                            <i class="far fa-star"></i>
+                            <span class="star-label">较差</span>
+                        </span>
+                        <span class="star" data-rating="3">
+                            <i class="far fa-star"></i>
+                            <span class="star-label">一般</span>
+                        </span>
+                        <span class="star" data-rating="4">
+                            <i class="far fa-star"></i>
+                            <span class="star-label">不错</span>
+                        </span>
+                        <span class="star" data-rating="5">
+                            <i class="far fa-star"></i>
+                            <span class="star-label">非常棒</span>
+                        </span>
+                    </div>
+                </div>
+                <input type="hidden" id="ratingValue" value="0">
+                <p id="ratingText" class="rating-text">请选择评分</p>
+                <button id="submitRating" class="btn btn-primary btn-full" disabled>
+                    <i class="fas fa-paper-plane"></i> 提交评分
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="utils.js"></script>
+    <script src="mod-detail.js"></script>
+</body>
+</html>
+
