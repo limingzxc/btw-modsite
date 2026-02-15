@@ -1,5 +1,7 @@
 // ==================== 日志管理功能 ====================
 
+const API_BASE = '/api';
+
 // 日志分页状态
 let currentLogPage = 1;
 const LOGS_PER_PAGE = 50;

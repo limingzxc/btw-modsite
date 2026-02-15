@@ -1,5 +1,7 @@
 // 通用工具函数库
 
+const API_BASE = '/api';
+
 /**
  * HTML 转义函数，防止 XSS 攻击
  * @param {string} text - 需要转义的文本
@@ -125,7 +127,7 @@ function updateAuthUI(user) {
  */
 async function handleLogoutCommon(callback) {
     try {
-        await fetch('http://localhost:3000/api/auth/logout', {
+        await fetch(`${API_BASE}/auth/logout`, {
             method: 'POST',
             headers: { 'Authorization': localStorage.getItem('userToken') }
         });
