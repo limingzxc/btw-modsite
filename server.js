@@ -37,6 +37,10 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// 信任反向代理传递的IP
+app.set('trust proxy', true);
+
 app.use(bodyParser.json({ limit: '10kb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10kb' }));
 
@@ -53,10 +57,15 @@ app.use((req, res, next) => {
         }
 
         const responseTime = Date.now() - startTime;
+        // 优先从反向代理获取真实IP
+        const realIP = req.get('X-Forwarded-For') ||
+                       req.get('X-Real-IP') ||
+                       req.ip ||
+                       req.connection.remoteAddress;
         const logData = {
             method: req.method,
             path: req.path,
-            ip: req.ip || req.connection.remoteAddress,
+            ip: realIP.split(',')[0].trim(), // 处理X-Forwarded-For可能包含多个IP
             userAgent: req.get('user-agent') || '',
             statusCode: res.statusCode,
             responseTime: responseTime,
