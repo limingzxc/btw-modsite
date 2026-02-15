@@ -8,9 +8,12 @@ const helmet = require('helmet');
 const bcrypt = require('bcryptjs');
 const SALT_ROUNDS = 12;
 
+// 加载环境变量
+require('dotenv').config();
+
 const app = express();
-const PORT = 3000;
-const DB_PATH = path.join(__dirname, 'data', 'btw.db');
+const PORT = process.env.PORT || 3000;
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'data', 'btw.db');
 
 // 安全响应头
 app.use(helmet({
@@ -167,6 +170,35 @@ const secureStatic = express.static(__dirname, {
     }
 });
 
+// 定义允许访问的文件扩展名白名单
+const ALLOWED_EXTENSIONS = [
+    '.html', '.htm',
+    '.css',
+    '.js',
+    '.json',
+    '.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.ico',
+    '.woff', '.woff2', '.ttf', '.eot',
+    '.txt', '.md'
+];
+
+// 定义允许访问的文件白名单
+const ALLOWED_FILES = [
+    'index.html',
+    'admin.html',
+    'login.html',
+    'register.html',
+    'mod-detail.html',
+    'styles.css',
+    'admin.css',
+    'mod-detail.css',
+    'auth.css',
+    'script.js',
+    'admin.js',
+    'mod-detail.js',
+    'utils.js',
+    'logs.js'
+];
+
 app.use((req, res, next) => {
     const filePath = path.join(__dirname, req.path);
 
@@ -185,6 +217,37 @@ app.use((req, res, next) => {
     // 检查数据库文件
     if (relativePath.match(/\.(db|sqlite|sqlite3)$/i)) {
         return res.status(403).json({ error: '访问被拒绝' });
+    }
+
+    // 检查环境变量文件
+    if (relativePath.match(/^\.env/i)) {
+        return res.status(403).json({ error: '访问被拒绝' });
+    }
+
+    // 检查日志文件
+    if (relativePath.match(/\.log$/i)) {
+        return res.status(403).json({ error: '访问被拒绝' });
+    }
+
+    // 检查服务器文件
+    if (relativePath === 'server.js' || relativePath === 'package.json') {
+        return res.status(403).json({ error: '访问被拒绝' });
+    }
+
+    // 检查文件扩展名（仅对静态资源请求）
+    if (!req.path.startsWith('/api/')) {
+        const ext = path.extname(filePath).toLowerCase();
+
+        // 允许的扩展名白名单检查
+        if (ext && !ALLOWED_EXTENSIONS.includes(ext)) {
+            return res.status(403).json({ error: '不允许的文件类型' });
+        }
+
+        // 检查特定文件白名单
+        const fileName = path.basename(filePath);
+        if (!ALLOWED_FILES.includes(fileName) && ext) {
+            return res.status(403).json({ error: '文件访问被拒绝' });
+        }
     }
 
     next();
