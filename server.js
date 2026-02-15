@@ -1226,7 +1226,7 @@ app.delete('/api/mods/:id', verifyAdminToken, (req, res) => {
 
 // 获取模组的评分记录
 app.get('/api/mods/:id/ratings', (req, res) => {
-    db.all('SELECT * FROM ratings WHERE modId = ?', [parseInt(req.params.id)], (err, ratings) => {
+    db.all('SELECT id, rating, createdAt FROM ratings WHERE modId = ?', [parseInt(req.params.id)], (err, ratings) => {
         if (err) {
             return res.status(500).json({ error: '获取评分记录失败' });
         }

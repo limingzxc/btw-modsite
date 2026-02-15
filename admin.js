@@ -240,9 +240,13 @@ async function handleAddMod(e) {
     };
 
     try {
+        const token = sessionStorage.getItem('adminToken');
         const response = await fetch(`${API_BASE}/mods`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
             body: JSON.stringify(modData)
         });
 
@@ -313,9 +317,13 @@ async function handleEditMod(e) {
     };
 
     try {
+        const token = sessionStorage.getItem('adminToken');
         const response = await fetch(`${API_BASE}/mods/${modId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
             body: JSON.stringify(modData)
         });
 
@@ -337,12 +345,16 @@ async function deleteMod(modId) {
     if (!confirm('确定要删除这个模组吗？')) {
         return;
     }
-    
+
     try {
+        const token = sessionStorage.getItem('adminToken');
         const response = await fetch(`${API_BASE}/mods/${modId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': token
+            }
         });
-        
+
         if (response.ok) {
             showNotification('模组删除成功！', 'success');
             loadMods();
