@@ -12,9 +12,12 @@
     --bg-color: #1f1f23;
     --surface-color: #2d2d33;
     --surface-light: #3d3d44;
+    --darker-bg: #1a1a1d;
     --text-primary: #f8f9fa;
     --text-secondary: #adb5bd;
     --text-muted: #6c757d;
+    --text-light: #f8f9fa;
+    --text-gray: #adb5bd;
     --border-color: #3d3d44;
     --shadow: rgba(0, 0, 0, 0.3);
 }
@@ -393,6 +396,18 @@ body {
 .sort-controls select:focus {
     outline: none;
     border-color: var(--primary-color);
+}
+
+.sort-controls select option {
+    background: var(--darker-bg);
+    color: var(--text-light);
+    padding: 0.5rem;
+}
+
+.sort-controls select option:hover,
+.sort-controls select option:checked {
+    background: var(--primary-color);
+    color: white;
 }
 
 .filter-btn {
@@ -791,24 +806,40 @@ body {
     border-left-color: var(--accent-color);
 }
 
-/* 下载指南部分的链接样式 */
+/* 特定区域的链接样式 */
 .contact a,
 .step a,
 .download a {
-    color: #007bff;
+    color: var(--primary-color);
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: all 0.3s ease;
+    position: relative;
+    display: inline-block;
 }
 
 .contact a:hover,
 .step a:hover,
 .download a:hover {
-    color: #0056b3;
-    text-decoration: underline;
+    color: var(--primary-hover);
+    text-decoration: none;
+    transform: translateY(-2px);
 }
 
-.contact a:visited,
-.step a:visited,
-.download a:visited {
-    color: #6f42c1;
+.contact a::after,
+.step a::after,
+.download a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.contact a:hover::after,
+.step a:hover::after,
+.download a:hover::after {
+    width: 100%;
 }

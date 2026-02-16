@@ -124,7 +124,6 @@ async function loadModDetail(modId) {
 }
 
 function renderModDetail(mod, hasRated = false, userRating = null) {
-    const categoryName = getCategoryName(mod.category);
     const ratingStars = generateStars(mod.rating);
     const backgroundStyle = mod.backgroundImage ? `background-image: url('${mod.backgroundImage}');` : '';
 
@@ -138,7 +137,6 @@ function renderModDetail(mod, hasRated = false, userRating = null) {
                 <div class="mod-large-icon">${escapeHtml(mod.icon)}</div>
                 <div class="mod-info">
                     <h1 class="mod-name">${escapeHtml(mod.name)}</h1>
-                    <span class="mod-category">${escapeHtml(categoryName)}</span>
                     <div class="mod-meta">
                         <div class="mod-meta-item">
                             <i class="fas fa-star"></i>
@@ -238,17 +236,6 @@ function renderModDetail(mod, hasRated = false, userRating = null) {
             </div>
         </div>
     `;
-}
-
-function getCategoryName(category) {
-    const names = {
-        'adventure': '冒险',
-        'technology': '科技',
-        'magic': '魔法',
-        'decoration': '装饰',
-        'utility': '实用'
-    };
-    return names[category] || category;
 }
 
 function generateStars(rating) {

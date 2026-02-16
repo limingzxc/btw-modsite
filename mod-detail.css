@@ -1,3 +1,34 @@
+:root {
+    --primary-color: #1bd96a;
+    --primary-hover: #15a352;
+    --secondary-color: #2d9cdb;
+    --bg-color: #1f1f23;
+    --surface-color: #2d2d33;
+    --surface-light: #3d3d44;
+    --darker-bg: #1a1a1d;
+    --text-primary: #f8f9fa;
+    --text-secondary: #adb5bd;
+    --text-muted: #6c757d;
+    --text-light: #f8f9fa;
+    --text-gray: #adb5bd;
+    --border-color: #3d3d44;
+    --card-bg: #2d2d33;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --accent-color: #ff6b6b;
+}
+
+/* 链接样式 */
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
 .mod-detail-container {
     min-height: calc(100vh - 70px);
     padding-top: 100px;
@@ -93,16 +124,6 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-}
-
-.mod-category {
-    display: inline-block;
-    padding: 0.4rem 1rem;
-    background: rgba(27, 217, 106, 0.15);
-    border-radius: 20px;
-    color: #1bd96a;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
 }
 
 .mod-meta {

@@ -29,7 +29,6 @@ function showLoginScreen() {
 function showAdminPanel() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminPanel').style.display = 'block';
-    loadCategories();
 }
 
 // 设置登录表单
@@ -77,15 +76,8 @@ function setupEventListeners() {
     // 编辑模组表单
     document.getElementById('editModForm').addEventListener('submit', handleEditMod);
 
-    // 添加分类表单
-    document.getElementById('addCategoryForm').addEventListener('submit', handleAddCategory);
-
-    // 编辑分类表单
-    document.getElementById('editCategoryForm').addEventListener('submit', handleEditCategory);
-
-    // 搜索和筛选
+    // 搜索
     document.getElementById('searchMod').addEventListener('input', loadMods);
-    document.getElementById('filterCategory').addEventListener('change', loadMods);
 
     // 退出登录
     document.getElementById('logoutBtn').addEventListener('click', async (e) => {
@@ -138,22 +130,14 @@ function setupEventListeners() {
             closeEditModal();
         }
     });
-
-    // 点击分类编辑弹窗外部关闭
-    document.getElementById('editCategoryModal').addEventListener('click', (e) => {
-        if (e.target.id === 'editCategoryModal') {
-            closeEditCategoryModal();
-        }
-    });
 }
 
 // 加载模组列表
 async function loadMods() {
     const search = document.getElementById('searchMod').value;
-    const category = document.getElementById('filterCategory').value;
-    
+
     try {
-        const response = await fetch(`${API_BASE}/mods?category=${category}`);
+        const response = await fetch(`${API_BASE}/mods`);
         let mods = await response.json();
         
         // 前端搜索
@@ -198,7 +182,7 @@ function displayModsTable(mods) {
                     <i class="fas fa-code"></i> 有源码链接
                 </div>` : ''}
             </td>
-            <td>${escapeHtml(getCategoryName(mod.category))}</td>
+            <td>${escapeHtml(mod.tags.join(', '))}</td>
             <td>
                 <div class="rating-stars">
                     ${generateStars(mod.rating)}
@@ -229,9 +213,8 @@ async function handleAddMod(e) {
     const modData = {
         name: formData.get('name'),
         description: formData.get('description'),
-        category: formData.get('category'),
-        icon: formData.get('icon') || '📦',
         tags: formData.get('tags') ? formData.get('tags').split(',').map(t => t.trim()) : [],
+        icon: formData.get('icon') || '📦',
         rating: parseFloat(formData.get('rating')),
         downloads: parseInt(formData.get('downloads')),
         cloudLink: formData.get('cloudLink'),
@@ -275,7 +258,6 @@ async function openEditModal(modId) {
         document.getElementById('editModId').value = mod.id;
         document.getElementById('editModName').value = mod.name;
         document.getElementById('editModDescription').value = mod.description;
-        document.getElementById('editModCategory').value = mod.category;
         document.getElementById('editModIcon').value = mod.icon || '📦';
         document.getElementById('editModTags').value = mod.tags ? mod.tags.join(', ') : '';
         document.getElementById('editModRating').value = mod.rating;
@@ -306,9 +288,8 @@ async function handleEditMod(e) {
     const modData = {
         name: formData.get('name'),
         description: formData.get('description'),
-        category: formData.get('category'),
-        icon: formData.get('icon') || '📦',
         tags: formData.get('tags') ? formData.get('tags').split(',').map(t => t.trim()) : [],
+        icon: formData.get('icon') || '📦',
         rating: parseFloat(formData.get('rating')),
         downloads: parseInt(formData.get('downloads')),
         cloudLink: formData.get('cloudLink'),
@@ -376,219 +357,5 @@ function showNotification(message, type = 'success') {
     setTimeout(() => {
         notification.classList.remove('show');
     }, 3000);
-}
-
-// ==================== 分类管理 ====================
-
-// 加载分类列表
-async function loadCategories() {
-    try {
-        const response = await fetch(`${API_BASE}/categories`);
-        const categories = await response.json();
-        displayCategoriesTable(categories);
-        updateCategorySelects(categories);
-    } catch (error) {
-        showNotification('加载分类失败', 'error');
-        console.error('Error loading categories:', error);
-    }
-}
-
-// 显示分类表格
-async function displayCategoriesTable(categories) {
-    const tbody = document.getElementById('categoriesTableBody');
-
-    if (categories.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="5" style="text-align: center; padding: 2rem;">
-                    暂无分类数据
-                </td>
-            </tr>
-        `;
-        return;
-    }
-
-    // 获取每个分类的模组数量
-    const modCounts = await Promise.all(
-        categories.map(async (cat) => {
-            try {
-                const response = await fetch(`${API_BASE}/mods?category=${cat.name}`);
-                const mods = await response.json();
-                return { id: cat.id, count: mods.length };
-            } catch {
-                return { id: cat.id, count: 0 };
-            }
-        })
-    );
-
-    tbody.innerHTML = categories.map(cat => {
-        const modCount = modCounts.find(m => m.id === cat.id)?.count || 0;
-        return `
-            <tr>
-                <td class="category-icon-cell">${cat.icon || ''}</td>
-                <td><strong>${cat.name}</strong></td>
-                <td>${cat.description || '-'}</td>
-                <td>${modCount}</td>
-                <td>
-                    <div class="action-buttons">
-                        <button class="action-btn edit" onclick="openEditCategoryModal(${cat.id})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn delete" onclick="deleteCategory(${cat.id}, ${modCount})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }).join('');
-}
-
-// 更新模组表单中的分类下拉框
-function updateCategorySelects(categories) {
-    const options = categories.map(cat => `<option value="${cat.name}">${cat.name}</option>`).join('');
-
-    const addSelect = document.getElementById('modCategory');
-    const editSelect = document.getElementById('editModCategory');
-    const filterSelect = document.getElementById('filterCategory');
-
-    if (addSelect) {
-        addSelect.innerHTML = `<option value="">选择分类</option>${options}`;
-    }
-    if (editSelect) {
-        editSelect.innerHTML = options;
-    }
-    if (filterSelect) {
-        filterSelect.innerHTML = `<option value="">所有分类</option>${options}`;
-    }
-}
-
-// 添加分类
-async function handleAddCategory(e) {
-    e.preventDefault();
-
-    const form = e.target;
-    const formData = new FormData(form);
-    const categoryData = {
-        name: formData.get('name'),
-        icon: formData.get('icon') || '',
-        description: formData.get('description') || ''
-    };
-
-    try {
-        const token = sessionStorage.getItem('adminToken');
-        const response = await fetch(`${API_BASE}/categories`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': token
-            },
-            body: JSON.stringify(categoryData)
-        });
-
-        if (response.ok) {
-            showNotification('分类添加成功！', 'success');
-            form.reset();
-            loadCategories();
-        } else {
-            const data = await response.json();
-            showNotification(data.error || '添加失败', 'error');
-        }
-    } catch (error) {
-        showNotification('添加失败，请重试', 'error');
-        console.error('Error adding category:', error);
-    }
-}
-
-// 打开编辑分类弹窗
-async function openEditCategoryModal(categoryId) {
-    try {
-        const response = await fetch(`${API_BASE}/categories/${categoryId}`);
-        const category = await response.json();
-
-        document.getElementById('editCategoryId').value = category.id;
-        document.getElementById('editCategoryName').value = category.name;
-        document.getElementById('editCategoryIcon').value = category.icon || '';
-        document.getElementById('editCategoryDescription').value = category.description || '';
-
-        document.getElementById('editCategoryModal').classList.add('show');
-    } catch (error) {
-        showNotification('加载分类信息失败', 'error');
-        console.error('Error loading category:', error);
-    }
-}
-
-// 关闭编辑分类弹窗
-function closeEditCategoryModal() {
-    document.getElementById('editCategoryModal').classList.remove('show');
-}
-
-// 编辑分类
-async function handleEditCategory(e) {
-    e.preventDefault();
-
-    const categoryId = document.getElementById('editCategoryId').value;
-    const form = e.target;
-    const formData = new FormData(form);
-    const categoryData = {
-        name: formData.get('name'),
-        icon: formData.get('icon') || '',
-        description: formData.get('description') || ''
-    };
-
-    try {
-        const token = sessionStorage.getItem('adminToken');
-        const response = await fetch(`${API_BASE}/categories/${categoryId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': token
-            },
-            body: JSON.stringify(categoryData)
-        });
-
-        if (response.ok) {
-            showNotification('分类更新成功！', 'success');
-            closeEditCategoryModal();
-            loadCategories();
-        } else {
-            const data = await response.json();
-            showNotification(data.error || '更新失败', 'error');
-        }
-    } catch (error) {
-        showNotification('更新失败，请重试', 'error');
-        console.error('Error updating category:', error);
-    }
-}
-
-// 删除分类
-async function deleteCategory(categoryId, modCount) {
-    if (modCount > 0) {
-        showNotification('该分类下还有模组，无法删除', 'error');
-        return;
-    }
-
-    if (!confirm('确定要删除这个分类吗？')) {
-        return;
-    }
-
-    try {
-        const token = sessionStorage.getItem('adminToken');
-        const response = await fetch(`${API_BASE}/categories/${categoryId}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': token }
-        });
-
-        if (response.ok) {
-            showNotification('分类删除成功！', 'success');
-            loadCategories();
-        } else {
-            const data = await response.json();
-            showNotification(data.error || '删除失败', 'error');
-        }
-    } catch (error) {
-        showNotification('删除失败，请重试', 'error');
-        console.error('Error deleting category:', error);
-    }
 }
 

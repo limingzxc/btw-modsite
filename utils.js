@@ -59,21 +59,7 @@ function formatNumber(num) {
     return num.toString();
 }
 
-/**
- * 获取分类中文名称
- * @param {string} category - 英文分类名
- * @returns {string} 中文分类名
- */
-function getCategoryName(category) {
-    const names = {
-        'adventure': '冒险',
-        'technology': '科技',
-        'magic': '魔法',
-        'decoration': '装饰',
-        'utility': '实用'
-    };
-    return names[category] || category;
-}
+
 
 /**
  * 显示通知消息
@@ -152,7 +138,6 @@ if (typeof module !== 'undefined' && module.exports) {
         escapeHtml,
         generateStars,
         formatNumber,
-        getCategoryName,
         showNotification,
         checkLoginStatus,
         updateAuthUI,

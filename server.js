@@ -376,26 +376,7 @@ function initDatabase() {
         });
     });
 
-    // 创建分类表
-    db.run(`CREATE TABLE IF NOT EXISTS categories (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT UNIQUE NOT NULL,
-        icon TEXT,
-        description TEXT,
-        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-    )`, () => {
-        // 创建索引以提高查询性能
-        db.run('CREATE INDEX IF NOT EXISTS idx_categories_name ON categories(name)', (err) => {
-            if (err) console.error('创建categories name索引失败:', err);
-        });
 
-        // 初始化分类数据
-        db.get('SELECT COUNT(*) as count FROM categories', (err, row) => {
-            if (err || row.count === 0) {
-                initCategoriesData();
-            }
-        });
-    });
 
     // 创建评分表
     db.run(`CREATE TABLE IF NOT EXISTS ratings (
@@ -482,23 +463,6 @@ function initDatabase() {
     });
 }
 
-// 初始化分类数据
-function initCategoriesData() {
-    const categories = [
-        { name: 'adventure', icon: '⚔️', description: '冒险探索' },
-        { name: 'technology', icon: '⚡', description: '科技自动化' },
-        { name: 'magic', icon: '✨', description: '魔法奇幻' },
-        { name: 'decoration', icon: '🏠', description: '建筑装饰' },
-        { name: 'utility', icon: '🔧', description: '实用工具' }
-    ];
-
-    const stmt = db.prepare('INSERT INTO categories (name, icon, description) VALUES (?, ?, ?)');
-    categories.forEach(cat => {
-        stmt.run(cat.name, cat.icon, cat.description);
-    });
-    stmt.finalize();
-    console.log('分类数据初始化完成');
-}
 
 // 初始化模组数据
 function initModsData() {
@@ -869,144 +833,12 @@ app.post('/api/admin/logout', verifyAdminToken, (req, res) => {
     });
 });
 
-// ==================== 分类API ====================
-
-// 获取所有分类
-app.get('/api/categories', (req, res) => {
-    db.all('SELECT id, name, icon, description FROM categories ORDER BY id', (err, categories) => {
-        if (err) {
-            return res.status(500).json({ error: '获取分类列表失败' });
-        }
-        res.json(categories);
-    });
-});
-
-// 获取单个分类
-app.get('/api/categories/:id', (req, res) => {
-    db.get('SELECT id, name, icon, description FROM categories WHERE id = ?', [parseInt(req.params.id)], (err, category) => {
-        if (err || !category) {
-            return res.status(404).json({ error: '分类未找到' });
-        }
-        res.json(category);
-    });
-});
-
-// 添加分类（管理员）
-app.post('/api/categories', verifyAdminToken, (req, res) => {
-    const { name, icon, description } = req.body;
-
-    // 输入验证
-    if (!name || name.trim().length === 0) {
-        return res.status(400).json({ error: '分类名称不能为空' });
-    }
-
-    if (name.length > 50) {
-        return res.status(400).json({ error: '分类名称不能超过50个字符' });
-    }
-
-    if (description && description.length > 200) {
-        return res.status(400).json({ error: '分类描述不能超过200个字符' });
-    }
-
-    db.run(
-        'INSERT INTO categories (name, icon, description) VALUES (?, ?, ?)',
-        [name.trim(), icon, description],
-        function(err) {
-            if (err) {
-                if (err.message.includes('UNIQUE constraint failed')) {
-                    return res.status(400).json({ error: '分类名称已存在' });
-                }
-                return res.status(500).json({ error: '添加分类失败' });
-            }
-
-            db.get('SELECT id, name, icon, description FROM categories WHERE id = ?', [this.lastID], (err, category) => {
-                if (err || !category) {
-                    return res.status(500).json({ error: '获取新分类失败' });
-                }
-                res.status(201).json(category);
-            });
-        }
-    );
-});
-
-// 更新分类（管理员）
-app.put('/api/categories/:id', verifyAdminToken, (req, res) => {
-    const { name, icon, description } = req.body;
-    const id = parseInt(req.params.id);
-
-    // 输入验证
-    if (!name || name.trim().length === 0) {
-        return res.status(400).json({ error: '分类名称不能为空' });
-    }
-
-    if (name.length > 50) {
-        return res.status(400).json({ error: '分类名称不能超过50个字符' });
-    }
-
-    if (description && description.length > 200) {
-        return res.status(400).json({ error: '分类描述不能超过200个字符' });
-    }
-
-    db.run(
-        'UPDATE categories SET name = ?, icon = ?, description = ? WHERE id = ?',
-        [name.trim(), icon, description, id],
-        function(err) {
-            if (err) {
-                if (err.message.includes('UNIQUE constraint failed')) {
-                    return res.status(400).json({ error: '分类名称已存在' });
-                }
-                return res.status(404).json({ error: '分类未找到或更新失败' });
-            }
-
-            db.get('SELECT id, name, icon, description FROM categories WHERE id = ?', [id], (err, category) => {
-                if (err || !category) {
-                    return res.status(500).json({ error: '获取分类失败' });
-                }
-                res.json(category);
-            });
-        }
-    );
-});
-
-// 删除分类（管理员）
-app.delete('/api/categories/:id', verifyAdminToken, (req, res) => {
-    const id = parseInt(req.params.id);
-
-    // 优化：使用子查询和JOIN来检查和获取分类，减少数据库查询次数
-    db.get('SELECT c.id, c.name, c.icon, c.description, COUNT(m.id) as modCount FROM categories c LEFT JOIN mods m ON c.name = m.category WHERE c.id = ? GROUP BY c.id', [id], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: '检查分类使用情况失败' });
-        }
-
-        if (!result) {
-            return res.status(404).json({ error: '分类未找到' });
-        }
-
-        if (result.modCount > 0) {
-            return res.status(400).json({ error: `该分类下还有${result.modCount}个模组，无法删除` });
-        }
-
-        const category = {
-            id: result.id,
-            name: result.name,
-            icon: result.icon,
-            description: result.description
-        };
-
-        db.run('DELETE FROM categories WHERE id = ?', [id], (err) => {
-            if (err) {
-                return res.status(500).json({ error: '删除分类失败' });
-            }
-            res.json(category);
-        });
-    });
-});
 
 // ==================== 模组API ====================
 
 // 获取所有模组
 app.get('/api/mods', (req, res) => {
-    const { category, sortBy } = req.query;
+    const { tag, sortBy } = req.query;
 
     // 验证sortBy参数，防止SQL注入
     const validSortOptions = ['default', 'rating', 'downloads', 'name'];
@@ -1014,33 +846,20 @@ app.get('/api/mods', (req, res) => {
         return res.status(400).json({ error: '无效的排序方式' });
     }
 
-    // 验证category参数，防止SQL注入
-    if (category && category !== 'all' && !/^[a-zA-Z0-9_-]+$/.test(category)) {
-        return res.status(400).json({ error: '无效的分类参数' });
-    }
-
-    let sql = 'SELECT id, name, description, category, tags, rating, downloads, icon, cloudLink, sourceLink, backgroundImage FROM mods';
+    let sql = 'SELECT id, name, description, tags, rating, downloads, icon, cloudLink, sourceLink, backgroundImage FROM mods';
     let params = [];
 
-    // 分类筛选 - 只允许已存在的分类名称
-    if (category && category !== 'all') {
-        // 验证分类是否存在
-        db.get('SELECT name FROM categories WHERE name = ?', [category], (err, cat) => {
-            if (err) {
-                return res.status(500).json({ error: '数据库查询失败' });
-            }
-            if (!cat) {
-                return res.status(400).json({ error: '无效的分类' });
-            }
-
-            sql += ' WHERE category = ?';
-            params.push(category);
-
-            executeModsQuery(sql, params, sortBy, res);
-        });
-    } else {
-        executeModsQuery(sql, params, sortBy, res);
+    // 标签筛选
+    if (tag && tag !== 'all') {
+        // 验证标签参数，防止SQL注入
+        if (!/^[a-zA-Z0-9\u4e00-\u9fa5_-]+$/.test(tag)) {
+            return res.status(400).json({ error: '无效的标签参数' });
+        }
+        sql += ' WHERE tags LIKE ?';
+        params.push(`%"${tag}"%`);
     }
+
+    executeModsQuery(sql, params, sortBy, res);
 });
 
 function executeModsQuery(sql, params, sortBy, res) {
@@ -1105,11 +924,11 @@ app.post('/api/mods/:id/download', (req, res) => {
 
 // 添加模组
 app.post('/api/mods', verifyAdminToken, (req, res) => {
-    const { name, description, category, tags, rating, downloads, icon, cloudLink, sourceLink, backgroundImage } = req.body;
+    const { name, description, tags, rating, downloads, icon, cloudLink, sourceLink, backgroundImage } = req.body;
 
     // 输入验证
-    if (!name || !description || !category) {
-        return res.status(400).json({ error: '名称、描述和分类不能为空' });
+    if (!name || !description || !tags || !Array.isArray(tags) || tags.length === 0) {
+        return res.status(400).json({ error: '名称、描述和标签不能为空' });
     }
 
     if (cloudLink && !validateInput(cloudLink, 'url')) {
@@ -1133,14 +952,14 @@ app.post('/api/mods', verifyAdminToken, (req, res) => {
     }
 
     db.run(
-        'INSERT INTO mods (name, description, category, tags, rating, downloads, icon, cloudLink, sourceLink, backgroundImage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [name, description, category, JSON.stringify(tags), rating || 0, downloads || 0, icon, cloudLink, sourceLink, backgroundImage || null],
+        'INSERT INTO mods (name, description, tags, rating, downloads, icon, cloudLink, sourceLink, backgroundImage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [name, description, JSON.stringify(tags), rating || 0, downloads || 0, icon, cloudLink, sourceLink, backgroundImage || null],
         function(err) {
             if (err) {
                 return res.status(500).json({ error: '添加模组失败' });
             }
 
-            db.get('SELECT * FROM mods WHERE id = ?', [this.lastID], (err, mod) => {
+            db.get('SELECT id, name, description, tags, rating, downloads, icon, cloudLink, sourceLink, backgroundImage FROM mods WHERE id = ?', [this.lastID], (err, mod) => {
                 if (err || !mod) {
                     return res.status(500).json({ error: '获取新模组失败' });
                 }
@@ -1154,12 +973,12 @@ app.post('/api/mods', verifyAdminToken, (req, res) => {
 
 // 更新模组
 app.put('/api/mods/:id', verifyAdminToken, (req, res) => {
-    const { name, description, category, tags, rating, downloads, icon, cloudLink, sourceLink, backgroundImage } = req.body;
+    const { name, description, tags, rating, downloads, icon, cloudLink, sourceLink, backgroundImage } = req.body;
     const id = parseInt(req.params.id);
 
     // 输入验证
-    if (!name || !description || !category) {
-        return res.status(400).json({ error: '名称、描述和分类不能为空' });
+    if (!name || !description || !tags || !Array.isArray(tags) || tags.length === 0) {
+        return res.status(400).json({ error: '名称、描述和标签不能为空' });
     }
 
     if (cloudLink && !validateInput(cloudLink, 'url')) {
@@ -1183,14 +1002,14 @@ app.put('/api/mods/:id', verifyAdminToken, (req, res) => {
     }
 
     db.run(
-        'UPDATE mods SET name = ?, description = ?, category = ?, tags = ?, rating = ?, downloads = ?, icon = ?, cloudLink = ?, sourceLink = ?, backgroundImage = ? WHERE id = ?',
-        [name, description, category, JSON.stringify(tags), rating, downloads, icon, cloudLink, sourceLink, backgroundImage || null, id],
+        'UPDATE mods SET name = ?, description = ?, tags = ?, rating = ?, downloads = ?, icon = ?, cloudLink = ?, sourceLink = ?, backgroundImage = ? WHERE id = ?',
+        [name, description, JSON.stringify(tags), rating, downloads, icon, cloudLink, sourceLink, backgroundImage || null, id],
         function(err) {
             if (err || this.changes === 0) {
                 return res.status(404).json({ error: '模组未找到' });
             }
 
-            db.get('SELECT * FROM mods WHERE id = ?', [id], (err, mod) => {
+            db.get('SELECT id, name, description, tags, rating, downloads, icon, cloudLink, sourceLink, backgroundImage FROM mods WHERE id = ?', [id], (err, mod) => {
                 if (err || !mod) {
                     return res.status(500).json({ error: '获取模组失败' });
                 }

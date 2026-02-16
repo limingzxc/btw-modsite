@@ -4,31 +4,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const user = checkLoginStatus();
     currentUser = user;
     updateAuthUI(user);
-    loadCategories();
+    loadTags();
     loadMods();
     setupEventListeners();
     setupScrollSpy(); // 添加滚动监听
 });
 
-async function loadCategories() {
+// 获取所有标签
+async function loadTags() {
     try {
-        const response = await fetch(`${API_BASE}/categories`);
-        const categories = await response.json();
-        renderFilterButtons(categories);
+        const response = await fetch(`${API_BASE}/mods`);
+        const mods = await response.json();
+
+        // 收集所有不重复的标签
+        const allTags = new Set();
+        mods.forEach(mod => {
+            if (mod.tags && Array.isArray(mod.tags)) {
+                mod.tags.forEach(tag => allTags.add(tag));
+            }
+        });
+
+        renderFilterButtons(Array.from(allTags).sort());
     } catch (error) {
-        console.error('加载分类失败:', error);
+        console.error('加载标签失败:', error);
     }
 }
 
-function renderFilterButtons(categories) {
+function renderFilterButtons(tags) {
     const container = document.querySelector('.filter-buttons');
     if (!container) return;
 
     let html = '<button class="filter-btn active" data-filter="all">全部</button>';
 
-    categories.forEach(cat => {
-        const displayName = cat.description || cat.name;
-        html += `<button class="filter-btn" data-filter="${cat.name}">${displayName}</button>`;
+    tags.forEach(tag => {
+        html += `<button class="filter-btn" data-filter="${tag}">${tag}</button>`;
     });
 
     container.innerHTML = html;
@@ -54,9 +63,9 @@ function setupFilterButtons() {
     });
 }
 
-async function loadMods(category = 'all', sortBy = 'default') {
+async function loadMods(tag = 'all', sortBy = 'default') {
     try {
-        const response = await fetch(`${API_BASE}/mods?category=${category}&sortBy=${sortBy}`);
+        const response = await fetch(`${API_BASE}/mods?tag=${tag}&sortBy=${sortBy}`);
         const mods = await response.json();
         renderMods(mods);
     } catch (error) {

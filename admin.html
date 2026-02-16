@@ -14,7 +14,7 @@
         <div class="login-container">
             <div class="login-box">
                 <div class="login-header">
-                    <i class="fas fa-cube"></i>
+                    <i class="fas fa-paw"></i>
                     <h2>BTW 管理后台</h2>
                     <p>请登录管理员账号</p>
                 </div>
@@ -39,7 +39,7 @@
         <nav class="navbar">
             <div class="container">
                 <div class="nav-brand">
-                    <i class="fas fa-cube"></i>
+                    <i class="fas fa-paw"></i>
                     <span>BTW - 比狼好</span>
                 </div>
                 <ul class="nav-menu">
@@ -56,7 +56,6 @@
                 <ul>
                     <li><a href="#add" class="sidebar-link active"><i class="fas fa-plus"></i>添加模组</a></li>
                     <li><a href="#list" class="sidebar-link"><i class="fas fa-list"></i>模组列表</a></li>
-                    <li><a href="#categories" class="sidebar-link"><i class="fas fa-tags"></i>分类管理</a></li>
                     <li><a href="#logs" class="sidebar-link"><i class="fas fa-history"></i>日志查看</a></li>
                 </ul>
             </aside>
@@ -77,26 +76,14 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="modCategory">分类 *</label>
-                            <select id="modCategory" name="category" required>
-                                <option value="">选择分类</option>
-                                <option value="adventure">冒险</option>
-                                <option value="technology">科技</option>
-                                <option value="magic">魔法</option>
-                                <option value="decoration">装饰</option>
-                                <option value="utility">实用</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
                             <label for="modIcon">图标</label>
                             <input type="text" id="modIcon" name="icon" placeholder="例如: ⚡, ✨, 🗡️" value="📦">
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
-                        <label for="modTags">标签 (用逗号分隔)</label>
-                        <input type="text" id="modTags" name="tags" placeholder="例如: 科技, 自动化">
+                        <label for="modTags">标签 * (用逗号分隔)</label>
+                        <input type="text" id="modTags" name="tags" placeholder="例如: 科技, 自动化" required>
                     </div>
                     
                     <div class="form-row">
@@ -137,21 +124,13 @@
                 <div class="mods-table-container">
                     <div class="table-header">
                         <input type="text" id="searchMod" class="search-input" placeholder="搜索模组...">
-                        <select id="filterCategory" class="filter-select">
-                            <option value="">所有分类</option>
-                            <option value="adventure">冒险</option>
-                            <option value="technology">科技</option>
-                            <option value="magic">魔法</option>
-                            <option value="decoration">装饰</option>
-                            <option value="utility">实用</option>
-                        </select>
                     </div>
                     <table class="mods-table">
                         <thead>
                             <tr>
                                 <th>图标</th>
                                 <th>名称</th>
-                                <th>分类</th>
+                                <th>标签</th>
                                 <th>评分</th>
                                 <th>下载量</th>
                                 <th>操作</th>
@@ -160,51 +139,6 @@
                         <tbody id="modsTableBody">
                         </tbody>
                     </table>
-                </div>
-            </section>
-
-            <section id="categories" class="admin-section">
-                <h2><i class="fas fa-tags"></i>分类管理</h2>
-                <div class="category-management">
-                    <div class="add-category-form">
-                        <h3>添加新分类</h3>
-                        <form id="addCategoryForm">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="categoryName">分类名称 *</label>
-                                    <input type="text" id="categoryName" name="name" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="categoryIcon">图标</label>
-                                    <input type="text" id="categoryIcon" name="icon" placeholder="例如: ⚡, ✨">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="categoryDescription">描述</label>
-                                <input type="text" id="categoryDescription" name="description" placeholder="分类描述">
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus"></i>添加分类
-                            </button>
-                        </form>
-                    </div>
-
-                    <div class="categories-table-container">
-                        <h3>分类列表</h3>
-                        <table class="categories-table">
-                            <thead>
-                                <tr>
-                                    <th>图标</th>
-                                    <th>名称</th>
-                                    <th>描述</th>
-                                    <th>模组数量</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody id="categoriesTableBody">
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
             </section>
 
@@ -323,38 +257,25 @@
             </div>
             <form id="editModForm" class="mod-form">
                 <input type="hidden" id="editModId">
-                
+
                 <div class="form-group">
                     <label for="editModName">模组名称 *</label>
                     <input type="text" id="editModName" name="name" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="editModDescription">描述 *</label>
                     <textarea id="editModDescription" name="description" rows="3" required></textarea>
                 </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editModCategory">分类 *</label>
-                        <select id="editModCategory" name="category" required>
-                            <option value="adventure">冒险</option>
-                            <option value="technology">科技</option>
-                            <option value="magic">魔法</option>
-                            <option value="decoration">装饰</option>
-                            <option value="utility">实用</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="editModIcon">图标</label>
-                        <input type="text" id="editModIcon" name="icon">
-                    </div>
-                </div>
-                
+
                 <div class="form-group">
-                    <label for="editModTags">标签 (用逗号分隔)</label>
-                    <input type="text" id="editModTags" name="tags">
+                    <label for="editModIcon">图标</label>
+                    <input type="text" id="editModIcon" name="icon">
+                </div>
+
+                <div class="form-group">
+                    <label for="editModTags">标签 * (用逗号分隔)</label>
+                    <input type="text" id="editModTags" name="tags" required>
                 </div>
                 
                 <div class="form-row">
@@ -389,39 +310,6 @@
                         <i class="fas fa-save"></i>保存修改
                     </button>
                     <button type="button" class="btn btn-secondary" onclick="closeEditModal()">
-                        <i class="fas fa-times"></i>取消
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 编辑分类弹窗 -->
-    <div id="editCategoryModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>编辑分类</h3>
-                <span class="close-modal" onclick="closeEditCategoryModal()">&times;</span>
-            </div>
-            <form id="editCategoryForm" class="mod-form">
-                <input type="hidden" id="editCategoryId">
-                <div class="form-group">
-                    <label for="editCategoryName">分类名称 *</label>
-                    <input type="text" id="editCategoryName" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="editCategoryIcon">图标</label>
-                    <input type="text" id="editCategoryIcon" name="icon">
-                </div>
-                <div class="form-group">
-                    <label for="editCategoryDescription">描述</label>
-                    <input type="text" id="editCategoryDescription" name="description">
-                </div>
-                <div class="form-buttons">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i>保存修改
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="closeEditCategoryModal()">
                         <i class="fas fa-times"></i>取消
                     </button>
                 </div>
